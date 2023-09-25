@@ -41,7 +41,7 @@ class BookingController extends Controller
 
         }
         elseif($request->__authenticatedUser->user_type == env('ADMIN_ROLE_ID') || $request->__authenticatedUser->user_type == env('SUPERADMIN_ROLE_ID')) ///
-        ///env File not included 
+        ///env File not included path need Properly 
         {
             $response = $this->repository->getAll($request);
         }

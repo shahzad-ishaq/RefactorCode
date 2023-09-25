@@ -51,7 +51,7 @@ class BookingRepository extends BaseRepository
         $this->logger->pushHandler(new StreamHandler(storage_path('logs/admin/laravel-' . date('Y-m-d') . '.log'), Logger::DEBUG));
         ////unknown class  'StreamHandler'
         $this->logger->pushHandler(new FirePHPHandler());
-        ////unknown class 'FirePHPHandler'
+        ////unknown class/function 'FirePHPHandler' Monolog library used for this function 
     }
 
     /**
@@ -137,7 +137,7 @@ class BookingRepository extends BaseRepository
 
         $immediatetime = 5;
         $consumer_type = $user->userMeta->consumer_type;
-        if ($user->user_type == env('CUSTOMER_ROLE_ID')) {
+        if ($user->user_type == env('CUSTOMER_ROLE_ID')) {///SendSMSHelper and env Set up the necessary environment variables in your .env file.
             $cuser = $user;
 
             if (!isset($data['from_language_id'])) {
@@ -248,7 +248,7 @@ class BookingRepository extends BaseRepository
             $data['b_created_at'] = date('Y-m-d H:i:s');
             if (isset($due))
                 $data['will_expire_at'] = TeHelper::willExpireAt($due, $data['b_created_at']);
-            ///TeHelper Class not included (Models).
+            ///TeHelper Class not Found (Models).
             $data['by_admin'] = isset($data['by_admin']) ? $data['by_admin'] : 'no';
 
             $job = $cuser->jobs()->create($data);
@@ -423,7 +423,7 @@ class BookingRepository extends BaseRepository
             'session_time' => $session_time,
             'for_text'     => 'faktura'
         ];
-        $mailer = new AppMailer();
+        $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
         $mailer->send($email, $name, $subject, 'emails.session-ended', $data);
 
         $job->save();
@@ -431,7 +431,7 @@ class BookingRepository extends BaseRepository
         $tr = $job->translatorJobRel->where('completed_at', Null)->where('cancel_at', Null)->first();
 
         Event::fire(new SessionEnded($job, ($post_data['userid'] == $job->user_id) ? $tr->user_id : $job->user_id));
-
+        ///Event Model not found Path need Properly add and SessionEnded class not foud
         $user = $tr->user()->first();
         $email = $user->email;
         $name = $user->name;
@@ -442,7 +442,7 @@ class BookingRepository extends BaseRepository
             'session_time' => $session_time,
             'for_text'     => 'lön'
         ];
-        $mailer = new AppMailer();
+        $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
         $mailer->send($email, $name, $subject, 'emails.session-ended', $data);
 
         $tr->completed_at = $completeddate;
@@ -485,7 +485,7 @@ class BookingRepository extends BaseRepository
             }
         }
         $jobs = TeHelper::convertJobIdsInObjs($job_ids);
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         return $jobs;
     }
 
@@ -505,7 +505,7 @@ class BookingRepository extends BaseRepository
             if ($oneUser->user_type == '2' && $oneUser->status == '1' && $oneUser->id != $exclude_user_id) { // user is translator and he is not disabled
                 if (!$this->isNeedToSendPush($oneUser->id)) continue;
                 $not_get_emergency = TeHelper::getUsermeta($oneUser->id, 'not_get_emergency');
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 if ($data['immediate'] == 'yes' && $not_get_emergency == 'yes') continue;
                 $jobs = $this->getPotentialJobIdsWithUserId($oneUser->id); // get all potential jobs of this user
                 foreach ($jobs as $oneJob) {
@@ -529,7 +529,7 @@ class BookingRepository extends BaseRepository
             }
         }
         $data['language'] = TeHelper::fetchLanguageFromJobId($data['from_language_id']);
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         $data['notification_type'] = 'suitable_job';
         $msg_contents = '';
         if ($data['immediate'] == 'no') {
@@ -544,7 +544,7 @@ class BookingRepository extends BaseRepository
         $logger = new Logger('push_logger');
 
         $logger->pushHandler(new StreamHandler(storage_path('logs/push/laravel-' . date('Y-m-d') . '.log'), Logger::DEBUG));
-        $logger->pushHandler(new FirePHPHandler());
+        $logger->pushHandler(new FirePHPHandler());////unknown class/function 'FirePHPHandler' Monolog library used for this function 
         $logger->addInfo('Push send for job ' . $job->id, [$translator_array, $delpay_translator_array, $msg_text, $data]);
         $this->sendPushNotificationToSpecificUsers($translator_array, $job->id, $data, $msg_text, false);       // send new booking push to suitable translators(not delay)
         $this->sendPushNotificationToSpecificUsers($delpay_translator_array, $job->id, $data, $msg_text, true); // send new booking push to suitable translators(need to delay)
@@ -590,7 +590,7 @@ class BookingRepository extends BaseRepository
         // send messages via sms handler
         foreach ($translators as $translator) {
             // send message to translator
-            $status = SendSMSHelper::send(env('SMS_NUMBER'), $translator->mobile, $message);
+            $status = SendSMSHelper::send(env('SMS_NUMBER'), $translator->mobile, $message);///SendSMSHelper and env Set up the necessary environment variables in your .env file.
             Log::info('Send SMS to ' . $translator->email . ' (' . $translator->mobile . '), status: ' . print_r($status, true));
         }
 
@@ -606,7 +606,7 @@ class BookingRepository extends BaseRepository
     {
         if (!DateTimeHelper::isNightTime()) return false;
         $not_get_nighttime = TeHelper::getUsermeta($user_id, 'not_get_nighttime');
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         if ($not_get_nighttime == 'yes') return true;
         return false;
     }
@@ -619,7 +619,7 @@ class BookingRepository extends BaseRepository
     public function isNeedToSendPush($user_id)
     {
         $not_get_notification = TeHelper::getUsermeta($user_id, 'not_get_notification');
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         if ($not_get_notification == 'yes') return false;
         return true;
     }
@@ -638,9 +638,9 @@ class BookingRepository extends BaseRepository
         $logger = new Logger('push_logger');
 
         $logger->pushHandler(new StreamHandler(storage_path('logs/push/laravel-' . date('Y-m-d') . '.log'), Logger::DEBUG));
-        $logger->pushHandler(new FirePHPHandler());
+        $logger->pushHandler(new FirePHPHandler());////unknown class/function 'FirePHPHandler' Monolog library used for this function 
         $logger->addInfo('Push send for job ' . $job_id, [$users, $data, $msg_text, $is_need_delay]);
-        if (env('APP_ENV') == 'prod') {
+        if (env('APP_ENV') == 'prod') {///Set up the necessary environment variables in your .env file.
             $onesignalAppID = config('app.prodOnesignalAppID');
             $onesignalRestAuthKey = sprintf("Authorization: Basic %s", config('app.prodOnesignalApiKey'));
         } else {
@@ -787,9 +787,9 @@ class BookingRepository extends BaseRepository
         if ($job->from_language_id != $data['from_language_id']) {
             $log_data[] = [
                 'old_lang' => TeHelper::fetchLanguageFromJobId($job->from_language_id),
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 'new_lang' => TeHelper::fetchLanguageFromJobId($data['from_language_id'])
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
             ];
             $old_lang = $job->from_language_id;
             $job->from_language_id = $data['from_language_id'];
@@ -893,7 +893,7 @@ class BookingRepository extends BaseRepository
             $job_data = $this->jobToData($job);
 
             $subject = 'Vi har nu återöppnat er bokning av ' . TeHelper::fetchLanguageFromJobId($job->from_language_id) . 'tolk för bokning #' . $job->id;
-           ///TeHelper Class not included (Models).
+           ///TeHelper Class not Found (Models).
             $this->mailer->send($email, $name, $subject, 'emails.job-change-status-to-customer', $dataEmail);
 
             $this->sendNotificationTranslator($job, $job_data, '*');   // send Push all sutiable translators
@@ -1021,7 +1021,7 @@ class BookingRepository extends BaseRepository
             $this->mailer->send($translator->email, $translator->name, $subject, 'emails.job-changed-translator-new-translator', $dataEmail);
 
             $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-            ///TeHelper Class not included (Models).
+            ///TeHelper Class not Found (Models).
             $this->sendSessionStartRemindNotification($user, $job, $language, $job->due, $job->duration);
             $this->sendSessionStartRemindNotification($translator, $job, $language, $job->due, $job->duration);
             return true;
@@ -1046,7 +1046,7 @@ class BookingRepository extends BaseRepository
     {
 
         $this->logger->pushHandler(new StreamHandler(storage_path('logs/cron/laravel-' . date('Y-m-d') . '.log'), Logger::DEBUG));
-        $this->logger->pushHandler(new FirePHPHandler());
+        $this->logger->pushHandler(new FirePHPHandler());////unknown class/function 'FirePHPHandler' Monolog library used for this function 
         $data = array();
         $data['notification_type'] = 'session_start_remind';
         $due_explode = explode(' ', $due);
@@ -1298,7 +1298,7 @@ class BookingRepository extends BaseRepository
         $data = array();
         $data['notification_type'] = 'job_expired';
         $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         $msg_text = array(
             "en" => 'Tyvärr har ingen tolk accepterat er bokning: (' . $language . ', ' . $job->duration . 'min, ' . $job->due . '). Vänligen pröva boka om tiden.'
         );
@@ -1427,7 +1427,7 @@ class BookingRepository extends BaseRepository
                 $job->status = 'assigned';
                 $job->save();
                 $user = $job->user()->get()->first();
-                $mailer = new AppMailer();
+                $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
 
                 if (!empty($job->user_email)) {
                     $email = $job->user_email;
@@ -1477,7 +1477,7 @@ class BookingRepository extends BaseRepository
                 $job->status = 'assigned';
                 $job->save();
                 $user = $job->user()->get()->first();
-                $mailer = new AppMailer();
+                $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
 
                 if (!empty($job->user_email)) {
                     $email = $job->user_email;
@@ -1496,7 +1496,7 @@ class BookingRepository extends BaseRepository
                 $data = array();
                 $data['notification_type'] = 'job_accepted';
                 $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 $msg_text = array(
                     "en" => 'Din bokning för ' . $language . ' translators, ' . $job->duration . 'min, ' . $job->due . ' har accepterats av en tolk. Vänligen öppna appen för att se detaljer om tolken.'
                 );
@@ -1511,7 +1511,7 @@ class BookingRepository extends BaseRepository
             } else {
                 // Booking already accepted by someone else
                 $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 $response['status'] = 'fail';
                 $response['message'] = 'Denna ' . $language . 'tolkning ' . $job->duration . 'min ' . $job->due . ' har redan accepterats av annan tolk. Du har inte fått denna tolkning';
             }
@@ -1556,7 +1556,7 @@ class BookingRepository extends BaseRepository
                 $data = array();
                 $data['notification_type'] = 'job_cancelled';
                 $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 $msg_text = array(
                     "en" => 'Kunden har avbokat bokningen för ' . $language . 'tolk, ' . $job->duration . 'min, ' . $job->due . '. Var god och kolla dina tidigare bokningar för detaljer.'
                 );
@@ -1572,7 +1572,7 @@ class BookingRepository extends BaseRepository
                     $data = array();
                     $data['notification_type'] = 'job_cancelled';
                     $language = TeHelper::fetchLanguageFromJobId($job->from_language_id);
-                    ///TeHelper Class not included (Models).
+                    ///TeHelper Class not Found (Models).
                     $msg_text = array(
                         "en" => 'Er ' . $language . 'tolk, ' . $job->duration . 'min ' . $job->due . ', har avbokat tolkningen. Vi letar nu efter en ny tolk som kan ersätta denne. Tack.'
                     );
@@ -1584,7 +1584,7 @@ class BookingRepository extends BaseRepository
                 $job->status = 'pending';
                 $job->created_at = date('Y-m-d H:i:s');
                 $job->will_expire_at = TeHelper::willExpireAt($job->due, date('Y-m-d H:i:s'));
-                ///TeHelper Class not included (Models).
+                ///TeHelper Class not Found (Models).
                 $job->save();
 //                Event::fire(new JobWasCanceled($job));
                 Job::deleteTranslatorJobRel($translator->id, $job_id);
@@ -1678,7 +1678,7 @@ class BookingRepository extends BaseRepository
             'session_time' => $session_time,
             'for_text'     => 'faktura'
         ];
-        $mailer = new AppMailer();
+        $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
         $mailer->send($email, $name, $subject, 'emails.session-ended', $data);
 
         $job->save();
@@ -1686,7 +1686,7 @@ class BookingRepository extends BaseRepository
         $tr = $job->translatorJobRel()->where('completed_at', Null)->where('cancel_at', Null)->first();
 
         Event::fire(new SessionEnded($job, ($post_data['user_id'] == $job->user_id) ? $tr->user_id : $job->user_id));
-
+        ///Event Model not found Path need Properly add and SessionEnded class not foud
         $user = $tr->user()->first();
         $email = $user->email;
         $name = $user->name;
@@ -1697,7 +1697,7 @@ class BookingRepository extends BaseRepository
             'session_time' => $session_time,
             'for_text'     => 'lön'
         ];
-        $mailer = new AppMailer();
+        $mailer = new AppMailer();///Configure the mailer to work with the AppMailer class
         $mailer->send($email, $name, $subject, 'emails.session-ended', $data);
 
         $tr->completed_at = $completeddate;
@@ -1738,7 +1738,7 @@ class BookingRepository extends BaseRepository
         $cuser = $request->__authenticatedUser;
         $consumer_type = $cuser->consumer_type;
 
-        if ($cuser && $cuser->user_type == env('SUPERADMIN_ROLE_ID')) {
+        if ($cuser && $cuser->user_type == env('SUPERADMIN_ROLE_ID')) {///Set up the necessary environment variables in your .env file..
             $allJobs = Job::query();///Job class or models not included,Path need Properly add,Path need Properly add
             if (isset($requestdata['feedback']) && $requestdata['feedback'] != 'false') {
                 $allJobs->where('ignore_feedback', '0');
@@ -1958,7 +1958,7 @@ class BookingRepository extends BaseRepository
         $all_translators = DB::table('users')->where('user_type', '2')->lists('email');///Use Unknown DB class ,Path need Properly add 'Illuminate\Support\Facades\DB'
 
         $cuser = Auth::user();///Use of unknown Auth class. resolve the issue use 'Illuminate\Support\Facades\Auth'
-        $consumer_type = TeHelper::getUsermeta($cuser->id, 'consumer_type');///TeHelper Class not included (Models).
+        $consumer_type = TeHelper::getUsermeta($cuser->id, 'consumer_type');///TeHelper Class not Found (Models).
 
 
         if ($cuser && $cuser->is('superadmin')) {
@@ -2046,7 +2046,7 @@ class BookingRepository extends BaseRepository
         $all_translators = DB::table('users')->where('user_type', '2')->lists('email');///Use Unknown DB class ,Path need Properly add 'Illuminate\Support\Facades\DB'
 
         $cuser = Auth::user();///Use of unknown Auth class. resolve the issue use 'Illuminate\Support\Facades\Auth'
-        $consumer_type = TeHelper::getUsermeta($cuser->id, 'consumer_type');///TeHelper Class not included (Models).
+        $consumer_type = TeHelper::getUsermeta($cuser->id, 'consumer_type');///TeHelper Class not Found (Models).
 
 
         if ($cuser && ($cuser->is('superadmin') || $cuser->is('admin'))) {
@@ -2172,7 +2172,7 @@ class BookingRepository extends BaseRepository
 
         $data = array();
         $data['created_at'] = date('Y-m-d H:i:s');
-        $data['will_expire_at'] = TeHelper::willExpireAt($job['due'], $data['created_at']);///TeHelper Class not included (Models).
+        $data['will_expire_at'] = TeHelper::willExpireAt($job['due'], $data['created_at']);///TeHelper Class not Found (Models).
         $data['updated_at'] = date('Y-m-d H:i:s');
         $data['user_id'] = $userid;
         $data['job_id'] = $jobid;
@@ -2182,7 +2182,7 @@ class BookingRepository extends BaseRepository
         $datareopen['status'] = 'pending';
         $datareopen['created_at'] = Carbon::now();///Miss Carbon class,Carbon PHP library used for handling date and time
         $datareopen['will_expire_at'] = TeHelper::willExpireAt($job['due'], $datareopen['created_at']);
-        ///TeHelper Class not included (Models).
+        ///TeHelper Class not Found (Models).
         ///$datareopen['updated_at'] = date('Y-m-d H:i:s');
 
         ///$this->logger->addInfo('USER #' . Auth::user()->id . ' reopen booking #: ' . $jobid);
@@ -2195,7 +2195,7 @@ class BookingRepository extends BaseRepository
             $job['status'] = 'pending';
             $job['created_at'] = Carbon::now();///Miss Carbon class,Carbon PHP library used for handling date and time
             $job['updated_at'] = Carbon::now();///Miss Carbon class,Carbon PHP library used for handling date and time
-            $job['will_expire_at'] = TeHelper::willExpireAt($job['due'], date('Y-m-d H:i:s'));///TeHelper Class not included (Models).
+            $job['will_expire_at'] = TeHelper::willExpireAt($job['due'], date('Y-m-d H:i:s'));///TeHelper Class not Found (Models).
             $job['updated_at'] = date('Y-m-d H:i:s');
             $job['cust_16_hour_email'] = 0;
             $job['cust_48_hour_email'] = 0;
